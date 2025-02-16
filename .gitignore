@@ -1,0 +1,22 @@
+# Ignore environment variables file
+.env
+
+# Ignore environment-specific config files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Ignore dependency directories
+node_modules/
+venv/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore Python package indicator files
+__init__.py
+
+# Ignore Python cache directories
+**/__pycache__/
