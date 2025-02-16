@@ -71,6 +71,6 @@ def ice_break_with(name: str) -> str:
 if __name__ == '__main__':
     print(
         ice_break_with(
-            name="Naveen JD JPMorgan Chase"
+            name="Name_of_the_person",
         )
     )
