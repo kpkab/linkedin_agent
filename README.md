@@ -1,0 +1,1 @@
+This is a Icebreaker GenAI agent, that will take a user or a person's name, then search for the person's linkedin profile URl. Then using the URL, it will scrape the profile and return the information in a structured format. The agent is designed to be used in a conversational manner, where the user can ask for information about a specific person or a list of people.
