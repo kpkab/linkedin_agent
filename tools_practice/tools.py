@@ -8,7 +8,7 @@ from langchain.agents.output_parsers import ReActSingleInputOutputParser
 from langchain.tools.render import render_text_description
 from langchain.schema import AgentAction, AgentFinish
 from typing import Union, List
-
+from langchain.agents.format_scratchpad import format_log_to_str
 dotenv_path = ".env"  # Ensure correct path
 load_dotenv(dotenv_path)
 if not load_dotenv(dotenv_path):
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     Begin!
 
     Question: {input}
-    Thought:
+    Thought:{agent_scratchpad}
     """
 
     prompt = PromptTemplate.from_template(template=template).partial(
@@ -76,10 +76,17 @@ if __name__ == "__main__":
         stop=["\nObservation"],
     )
     # llm = ChatOpenAI(temperature=0, model_name="gpt-4o-mini", openai_api_key=openai_api_key,verbose=True, stop=["\nObservation"]) #agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,)
-    agent = {"input": lambda x: x["input"]} | prompt | llm | ReActSingleInputOutputParser()
+    intermediate_steps = []
+    agent = {"input": lambda x: x["input"], 
+             "agent_scratchpad": lambda x: format_log_to_str(x["agent_scratchpad"])} | prompt | llm | ReActSingleInputOutputParser()
     
     # agent_execution = agent.invoke({"input": "What is the length of 'Dog and Cat' in characters?"})
-    agent_step: Union[AgentAction, AgentFinish] = agent.invoke({"input": "How many characters are there in the word: Dog ?"})
+    agent_step: Union[AgentAction, AgentFinish] = agent.invoke(
+        {
+            "input": "How many characters are there in the word: Dog?", 
+            "agent_scratchpad": intermediate_steps
+        }
+    )
     print(agent_step)
 
     if isinstance(agent_step, AgentAction):
@@ -89,3 +96,15 @@ if __name__ == "__main__":
 
         observation = tool_to_use.func(str(tool_input))
         print(f"{observation=}")
+        intermediate_steps.append((agent_step, str(observation)))
+
+    agent_step: Union[AgentAction, AgentFinish] = agent.invoke(
+        {
+            "input": "How many characters are there in the word: RAT?", 
+            "agent_scratchpad": intermediate_steps
+        }
+    )
+    # print(agent_step)
+    if isinstance(agent_step, AgentFinish):
+        print("### AgentFinish ###")
+        print(agent_step.return_values)
